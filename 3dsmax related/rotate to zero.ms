@@ -1,0 +1,1 @@
+for node in selection do node.rotation.controller.value = quat 1
