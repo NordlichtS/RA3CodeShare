@@ -1,0 +1,598 @@
+//////////////////////////////////////////////////////////////////////////////
+// ©2005 Electronic Arts Inc
+//
+// FX Shader for simple unlit rendering
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// 帝国建筑展开投影的着色器，支持阵营色
+// 基于红警3的BasicW3DHolographic.fxo和命令与征服3的Simple.fx
+// 2019/2 岚依
+//  lanyi@ra3.moe
+//  红警3吧 https://tieba.baidu.com/RA3
+//////////////////////////////////////////////////////////////////////////////
+
+// ----------------------------------------------------------------------------
+// 由命令与征服3的Common.fxh定义的内容
+// ----------------------------------------------------------------------------
+
+#define _WW3D_
+#define _WW3D_VERSION_ 1
+
+// Set some preprocessor define for 3DSMax.
+// Since we can't set it there, define it excluding our other tools.
+#if !defined(_WW3D_) && !defined(_FX_COMPOSER_)
+#define _3DSMAX_
+#endif
+
+// This is used by 3dsmax to load the correct parser
+#if defined(_3DSMAX_)
+    string ParamID = "0x1";
+#endif
+
+// Use these macros to define shader arrays.
+// The "direct" version of the macro will never try to use the expression evaluator to evaluate the array index.
+#define ARRAY_EXPRESSION_DIRECT_VS(arrayName, expression, noArraySupportAlternative) ( arrayName[ expression ] )
+#define ARRAY_EXPRESSION_DIRECT_PS(arrayName, expression, noArraySupportAlternative) ( arrayName[ expression ] )
+#define DEFINE_ARRAY_MULTIPLIER(initializer) static const int initializer
+
+// Threshold for AlphaRef render state when doing alpha testing
+#define DEFAULT_ALPHATEST_THRESHOLD 0x60
+
+// ----------------------------------------------------------------------------
+// 由命令与征服3的Win32_macros.fxh定义的内容
+// ----------------------------------------------------------------------------
+
+#define EA_PLATFORM_WINDOWS
+
+// Taken from d3d9types.h D3DCULL enum
+static const int D3DCULL_NONE                = 1;
+static const int D3DCULL_CW                  = 2;
+static const int D3DCULL_CCW                 = 3;
+
+// ----------------------------------------------------------------------------
+// 材质参数
+// ----------------------------------------------------------------------------
+
+string DefaultParameterScopeBlock = "material";
+
+// 主贴图（建筑投影里的网格贴图）
+texture Texture_0
+<
+    string UIName = "Base Texture";
+>;
+sampler2D Texture_0Sampler
+<
+    string Texture = "Texture_0";
+    string UIName = "Base Texture";
+> = sampler_state {
+    Texture = < Texture_0 >;
+    MinFilter = Anisotropic;
+    MagFilter = Linear;
+    MipFilter = Linear;
+    AddressU = Wrap;
+    AddressV = Wrap;
+    AddressW = Clamp;
+};
+
+// UV0 Scl/Move: 主贴图UV变换 （可以缩放、移动UV）
+// 前两项是缩放，后两项是移动速度
+float4 TexCoordTransform_0
+<
+    string UIName = "UV0 Scl/Move 1";
+    string UIWidget = "Spinner";
+    float UIMin = -100;
+    float UIMax = 100;
+> = float4(0.07, 0.09, 0.45, 0.27);
+float4 TexCoordTransform_1
+<
+    string UIName = "UV0 Scl/Move 2";
+    string UIWidget = "Spinner";
+    float UIMin = -100;
+    float UIMax = 100;
+> = float4(0.05, 0.03, -0.39, -0.53);
+
+// 发光颜色
+float3 ColorEmissive
+<
+    string UIName = "Emissive Material Color";
+    string UIWidget = "Color";
+> = float3(0.1, 0.1, 0.1);
+
+// 发光颜色在最终颜色中的占比
+// 最终颜色 = 发光颜色占比 * 发光颜色 + 阵营色占比 * 阵营色
+float EmissiveColorFactor
+<
+    string UIName = "Emissive Color Factor";
+> = 0.1;
+
+// 阵营色在最终颜色中的占比
+float RecolorColorFactor
+<
+    string UIName = "House Color Factor";
+> = 0.9;
+
+// 是否使用贴图的Alpha通道
+bool UseAlphaFromTextureAlphaChannel
+<
+    string UIName = "Use Alpha From Texture Alpha Channel";
+> = false;
+
+// 最低透明度；只在不使用贴图的Alpha通道时才有效
+float MinimumOpacity
+<
+    string UIName = "Minimum Opacity";
+> = 0.25;
+
+// ----------------------------------------------------------------------------
+// 其他参数
+// ----------------------------------------------------------------------------
+float Time : Time;
+
+int NumJointsPerVertex
+<
+    string UIWidget = "None";
+    string SasBindAddress = "Sas.Skeleton.NumJointsPerVertex";
+> = 0;
+
+DEFINE_ARRAY_MULTIPLIER(VS_Multiplier_NumJointsPerVertex = 1);
+
+bool DepthWriteEnable
+<
+    string UIName = "Depth Write Enable";
+> = true;
+
+bool AlphaTestEnable
+<
+    string UIName = "AlphaTestEnable";
+> = false;
+
+bool CullingEnable
+<
+    string UIName = "Culling Enable";
+> = true;
+
+bool3 HasRecolorColors
+<
+    string UIName = "None";
+    string SasBindAddress = "WW3D.HasRecolorColors";
+    bool ExportValue = false;
+> = false;
+
+shared float3 RecolorColor : register(ps, c0)
+<
+    bool unmanaged = true;
+> = float3(0, 0, 0);
+
+// ----------------------------------------------------------------------------
+// 战争迷雾
+// ----------------------------------------------------------------------------
+texture ShroudTexture
+<
+    string UIWidget = "None";
+    string SasBindAddress = "Terrain.Shroud.Texture";
+>;
+sampler2D ShroudTextureSampler
+<
+    string Texture = "ShroudTexture";
+    string UIWidget = "None";
+    string SasBindAddress = "Terrain.Shroud.Texture";
+> = sampler_state {
+    Texture = < ShroudTexture >;
+    MinFilter = Linear;
+    MagFilter = Linear;
+    MipFilter = Linear;
+    AddressU = Clamp;
+    AddressV = Clamp;
+};
+
+// ----------------------------------------------------------------------------
+// 暂时没有用到的必须存在的参数
+// 下面的变量，以及下面的汇编参数由RA3着色器的汇编得出
+// 请不要删除它们，否则有可能出现奇怪的问题
+// ----------------------------------------------------------------------------
+
+shared float3 TintColor : register(vs, c2) : register(ps, c2)
+<
+    string UIName = "Tint Color";
+    string UIWidget = "Color";
+    string SasBindAddress = "TintColor";
+    bool ExportValue = false;
+> = float3(1, 1, 1);
+
+shared float3 AmbientLightColor : register(vs, c4) : register(ps, c4)
+<
+    bool unmanaged = true;
+> = float3(0.3, 0.3, 0.3);
+
+
+shared struct {
+     float3 Color;
+     float3 Direction;
+} DirectionalLight[3] : register(vs, c5) : register(ps, c5)
+<
+    bool unmanaged = true;
+>;
+
+// ----------------------------------------------------------------------------
+// 红色警戒3的 BasicW3DHolographic.fxo 汇编代码使用到的参数
+// ----------------------------------------------------------------------------
+
+shared float OpacityOverride : register(c1)
+<
+    bool unmanaged = true;
+> = 1.0;
+
+struct {
+    float4 ScaleUV_OffsetUV;
+} Shroud : register(c11)
+<
+    string UIWidget = "None";
+    string SasBindAddress = "Terrain.Shroud";
+>;
+
+shared struct {
+    float4 WorldPositionMultiplier_XYZZ;
+    float2 CurrentOffsetUV;
+} Cloud : register(c117)
+<
+    bool unmanaged = true;
+>;
+
+shared float4x4 ViewProjection : ViewProjection : register(c119)
+<
+    bool unmanaged = true;
+>;
+
+shared float3 EyePosition : register(c123)
+<
+    bool unmanaged = true;
+>;
+
+float4x3 World : World : register(c124);
+
+shared float4 WorldBones[128] : register(c128)
+<
+    bool unmanaged = true;
+>;
+
+// ----------------------------------------------------------------------------
+// 顶点着色器（Vertex Shader)
+// 下面的 VS1, VS2, VS3 的代码由汇编翻译而来
+// （HLSL貌似不支持内联汇编，那么我只能尝试把汇编重新翻译成HLSL了...），
+// 我也不知道这些代码到底是什么意思
+// 假如它们有用，那么最好；假如它们没用，那么我也不知道是为什么
+// ----------------------------------------------------------------------------
+
+struct VSOutput
+{
+    float4 Position : POSITION;
+    float4 TexCoord0 : TEXCOORD0;
+    float4 CloudAndShroud : TEXCOORD2;
+    float TexCoord3 : TEXCOORD3;
+    float4 Color : COLOR1;
+};
+
+#if defined(_3DSMAX_)
+
+float4x4 WorldViewProjection : WorldViewProjection;
+// 3DS MAX 专用的简易版顶点着色器
+VSOutput VS3DSMAX(float3 Position : POSITION, float2 TexCoord0 : TEXCOORD0) {
+    VSOutput Out;
+    Out.Position = mul(float4(Position, 1), WorldViewProjection);
+    Out.TexCoord0.xy = TexCoord0 * TexCoordTransform_0.xy + Time * TexCoordTransform_0.zw;
+    Out.TexCoord0.zw = TexCoord0 * TexCoordTransform_1.xy + Time * TexCoordTransform_1.zw;
+    Out.CloudAndShroud = float4(0, 0, 0, 0);
+    Out.TexCoord3 = float4(0, 0, 0, 0);
+    Out.Color = float4(1, 1, 1, 1);
+    return Out;
+}
+#endif
+
+struct VSInputFirst
+{
+    float3 Position : POSITION;
+    float3 Normal : NORMAL;
+    float4 Color : COLOR;
+    float3 Tangent: TANGENT;
+    float3 Binormal : BINORMAL;
+    float2 TexCoord0 : TEXCOORD0;
+    float2 TexCoord1 : TEXCOORD1;
+};
+
+VSOutput VS1(VSInputFirst In) {
+
+    const float4 c3 = float4(1, 0, 0.100000001, 0);
+    const float4 c2 = float4(0.707116067, -0.707097471, 0.707097471, 0);
+
+    VSOutput Out;
+
+    float4 r0;
+    float4 r1;
+    float4 r2;
+    float4 r3;
+
+    r1 = (In.Position.xyzx * c3.xxxy + c3.yyyx);
+    r0 = float4(mul(r1, World), c3.x);
+    Out.Position = mul(r0, ViewProjection);
+    r1.xyz = mul(In.Normal, World);
+    r2.xyz = -r0 + EyePosition;
+    r0.zw = (r0.z * Cloud.WorldPositionMultiplier_XYZZ).zw;
+    r3.xyz = normalize(float3(r2.xyz));
+    r1.x = dot(float3(r1.xyz), float3(r3.xyz));
+    r1.x = max(r1.x, c3.y);
+    r1.x = min(r1.x, c3.x);
+    r1.x = sqrt(r1.x);
+    Out.TexCoord3.x = -r1.x + c3.x;
+    Out.Color = float4(c3.xxx, In.Color.w * OpacityOverride.x);
+    r1 = r0.xxyy * c2.xyzx;
+    r1.xy = r1.zwzw + r1;
+    Out.TexCoord0.xy = (r1) * TexCoordTransform_0.xy + Time * TexCoordTransform_0.zw;
+    Out.TexCoord0.zw = (r1) * TexCoordTransform_1.xy + Time * TexCoordTransform_1.zw;
+    r0.zw = (r0.xyxy * Cloud.WorldPositionMultiplier_XYZZ.xyxy + (-r0)).zw;
+    r0.xy = r0.yxzw + Shroud.ScaleUV_OffsetUV.wzzw;
+    // 云的uv
+    Out.CloudAndShroud.xy = r0.zwzw + Cloud.CurrentOffsetUV;
+    // 战争迷雾uv
+    Out.CloudAndShroud.zw = (r0.xyxy * Shroud.ScaleUV_OffsetUV.xyyx).zw;
+
+    return Out;
+}
+
+struct VSInputSecond {
+    float4 BlendIndices : BLENDINDICES;
+    float3 Position : POSITION;
+    float3 Normal : NORMAL;
+    float4 Color : COLOR;
+    float3 Tangent : TANGENT;
+    float3 Binormal : BINORMAL;
+    float2 TexCoord0 : TEXCOORD0;
+    float2 TexCoord1 : TEXCOORD1;
+    //float4 BlendIndices : BLENDINDICES;
+};
+
+VSOutput VS2(VSInputSecond In) {
+    const float4 c2 = float4(0.707116067, 0.707097471, -0.707097471, 0);
+    const float4 c3 = float4(1, -1, 0, 0.100000001);
+
+    VSOutput Out;
+
+    float4 r0;
+    float4 r1;
+    float4 r2;
+    float4 r3;
+    int address;
+
+    r0.x = (In.BlendIndices.x < -In.BlendIndices.x) ? 1.0f : 0.0f; //r0.x = i < 0
+    r0.y = frac(In.BlendIndices.x);
+    r0.z = (-r0.y) + (In.BlendIndices.x);
+    r0.y = (-r0.y < r0.y) ? 1.0f : 0.0f;
+    r0.x = (r0.x) * (r0.y) + (r0.z);
+    r0.x = (r0.x) + (r0.x);
+    address = (int)(r0.x);
+    r0 = (In.Position.zxyy) * (WorldBones[address].yzxy);
+    r0 = (WorldBones[address].wwwx) * (In.Position.xyzx) + (r0);
+    r1 = (In.Position.yzxz) * (WorldBones[address].zxyz);
+    r0 = (r0) * (c3.xxxy) + (-r1);
+    r1.xyz = (r0.w) * (WorldBones[address]);
+    r1.xyz = (WorldBones[address].w) * (r0) + (-r1);
+    r1.xyz = (WorldBones[address].yzxw) * (r0.zxyw) + (r1);
+    r0.xyz = (WorldBones[address].zxyw) * (-r0.yzxw) + (r1);
+    r0.xyz = (r0) + (WorldBones[address + 1]);
+    r0.w = c3.x;
+    Out.Position = mul(r0, ViewProjection);
+    r1 = (In.Normal.zxyy) * (WorldBones[address].yzxy);
+    r1 = (WorldBones[address].wwwx) * (In.Normal.xyzx) + (r1);
+    r2 = (In.Normal.yzxz) * (WorldBones[address].zxyz);
+    r1 = (r1) * (c3.xxxy) + (-r2);
+    r2.xyz = (r1.w) * (WorldBones[address]);
+    r2.xyz = (WorldBones[address].w) * (r1) + (-r2);
+    r2.xyz = (WorldBones[address].yzxw) * (r1.zxyw) + (r2);
+    r1.xyz = (WorldBones[address].zxyw) * (-r1.yzxw) + (r2);
+    r0.w = (In.Color.w) * (WorldBones[address + 1].w);
+    r2.xyz = (-r0) + (EyePosition);
+    r3.xyz = normalize(float3(r2.xyz));
+    r1.x = dot(float3(r1.xyz), float3(r3.xyz));
+    r1.x = max(r1.x, c3.z);
+    r1.x = min(r1.x, c3.x);
+    r1.x = sqrt(r1.x);
+    Out.TexCoord3.x = (-r1.x) + (c3.x);
+    Out.Color = float4(c3.xxx, (r0.w) * (OpacityOverride.x));
+    r1 = (r0.xyxy) * (c2.xyzx);
+    r1.xy = (r1.ywzw) + (r1.xzzw);
+    Out.TexCoord0.xy = (r1) * TexCoordTransform_0.xy + Time * TexCoordTransform_0.zw;
+    Out.TexCoord0.zw = (r1) * TexCoordTransform_1.xy + Time * TexCoordTransform_1.zw;
+    r0.zw = ((r0.z) * (Cloud.WorldPositionMultiplier_XYZZ)).zw;
+    r0.zw = ((r0.xyxy) * (Cloud.WorldPositionMultiplier_XYZZ.xyxy) + (-r0)).zw;
+    r0.xy = (r0.yxzw) + (Shroud.ScaleUV_OffsetUV.wzzw);
+    // 云的uv
+    Out.CloudAndShroud.xy = (r0.zwzw) + (Cloud.CurrentOffsetUV);
+    // 战争迷雾uv
+    Out.CloudAndShroud.zw = ((r0.xyxy) * (Shroud.ScaleUV_OffsetUV.xyyx)).zw;
+
+    return Out;
+}
+
+struct VSInputThird {
+    float4 BlendIndices : BLENDINDICES;
+    float2 BlendWeight : BLENDWEIGHT;
+    float3 Position0 : POSITION0;
+    float3 Position1 : POSITION1;
+    float3 Normal0 : NORMAL0;
+    float3 Normal1 : NORMAL1;
+    float4 Color : COLOR; 
+    float3 Tangent : TANGENT;
+    float3 Binormal : BINORMAL; 
+    float2 TexCoord0 : TEXCOORD0;
+    float2 TexCoord1 : TEXCOORD1;
+    //float4 BlendIndices : BLENDINDICES;
+    //float2 BlendWeight : BLENDWEIGHT;
+};
+
+VSOutput VS3(VSInputThird In) {
+    const float4 c2 = float4(0.707116067, 0.707097471, -0.707097471, 0);
+    const float4 c3 = float4(1, -1, 0, 0.100000001);
+
+    VSOutput Out;
+
+    float4 r0;
+    float4 r1;
+    float4 r2;
+    float4 r3;
+
+    int2 address;
+
+    r0.xy = (In.BlendIndices < In.BlendIndices) ? 1.0f : 0.0f;
+    r0.zw = frac(In.BlendIndices.xyxy).zw;
+    r1.xy = (-r0.zwzw) + (In.BlendIndices);
+    r0.zw = ((-r0 < r0) ? 1.0f : 0.0f).zw;
+    r0.xy = (r0.xy) * (r0.zw) + (r1.xy);
+    r0.xy = (r0) + (r0);
+    address.xy = (int)(r0);
+    r0 = (In.Position1.zxyy) * (WorldBones[address.y].yzxy);
+    r0 = (WorldBones[address.y].wwwx) * (In.Position1.xyzx) + (r0);
+    r1 = (In.Position1.yzxz) * (WorldBones[address.y].zxyz);
+    r0 = (r0) * (c3.xxxy) + (-r1);
+    r1.xyz = (r0.w) * (WorldBones[address.y]);
+    r1.xyz = (WorldBones[address.y].w) * (r0) + (-r1);
+    r1.xyz = (WorldBones[address.y].yzxw) * (r0.zxyw) + (r1);
+    r0.xyz = (WorldBones[address.y].zxyw) * (-r0.yzxw) + (r1);
+    r0.xyz = (r0) + (WorldBones[address.y + 1]);
+    r0.xyz = (r0) * (In.BlendWeight.y);
+    r1 = (In.Position0.zxyy) * (WorldBones[address.x].yzxy);
+    r1 = (WorldBones[address.x].wwwx) * (In.Position0.xyzx) + (r1);
+    r2 = (In.Position0.yzxz) * (WorldBones[address.x].zxyz);
+    r1 = (r1) * (c3.xxxy) + (-r2);
+    r2.xyz = (r1.w) * (WorldBones[address.x]);
+    r2.xyz = (WorldBones[address.x].w) * (r1) + (-r2);
+    r2.xyz = (WorldBones[address.x].yzxw) * (r1.zxyw) + (r2);
+    r1.xyz = (WorldBones[address.x].zxyw) * (-r1.yzxw) + (r2);
+    r1.xyz = (r1) + (WorldBones[address.x + 1]);
+    r0.xyz = (r1) * (In.BlendWeight.x) + (r0);
+    r0.w = c3.x;
+    Out.Position = mul(r0, ViewProjection);
+    r1 = (In.Normal1.zxyy) * (WorldBones[address.y].yzxy);
+    r1 = (WorldBones[address.y].wwwx) * (In.Normal1.xyzx) + (r1);
+    r2 = (In.Normal1.yzxz) * (WorldBones[address.y].zxyz);
+    r1 = (r1) * (c3.xxxy) + (-r2);
+    r2.xyz = (r1.w) * (WorldBones[address.y]);
+    r2.xyz = (WorldBones[address.y].w) * (r1) + (-r2);
+    r2.xyz = (WorldBones[address.y].yzxw) * (r1.zxyw) + (r2);
+    r1.xyz = (WorldBones[address.y].zxyw) * (-r1.yzxw) + (r2);
+    r1.xyz = (r1) * (In.BlendWeight.y);
+    r2 = (In.Normal0.zxyy) * (WorldBones[address.x].yzxy);
+    r2 = (WorldBones[address.x].wwwx) * (In.Normal0.xyzx) + (r2);
+    r3 = (In.Normal0.yzxz) * (WorldBones[address.x].zxyz);
+    r2 = (r2) * (c3.xxxy) + (-r3);
+    r3.xyz = (r2.w) * (WorldBones[address.x]);
+    r3.xyz = (WorldBones[address.x].w) * (r2) + (-r3);
+    r3.xyz = (WorldBones[address.x].yzxw) * (r2.zxyw) + (r3);
+    r2.xyz = (WorldBones[address.x].zxyw) * (-r2.yzxw) + (r3);
+    r1.xyz = (r2) * (In.BlendWeight.x) + (r1);
+    r2.xyz = (-r0) + (EyePosition);
+    r3.xyz = normalize(float3(r2.xyz));
+    r0.w = dot(float3(r1.xyz), float3(r3.xyz));
+    r0.w = max(r0.w, c3.z);
+    r0.w = min(r0.w, c3.x);
+    r0.w = sqrt(r0.w);
+    Out.TexCoord3.x = (-r0.w) + (c3.x);
+    r0.w = (In.BlendWeight.y) * (WorldBones[address.y + 1].w);
+    r0.w = (WorldBones[address.x + 1].w) * (In.BlendWeight.x) + (r0.w);
+    r0.w = (r0.w) * (In.Color.w);
+    Out.Color = float4(c3.xxx, (r0.w) * (OpacityOverride.x));
+    r1 = (r0.xyxy) * (c2.xyzx);
+    r1.xy = (r1.ywzw) + (r1.xzzw);
+    Out.TexCoord0.xy = (r1) * TexCoordTransform_0.xy + TexCoordTransform_0.zw * Time;
+    Out.TexCoord0.zw = (r1) * TexCoordTransform_1.xy + TexCoordTransform_1.zw * Time;
+    r0.zw = ((r0.z) * (Cloud.WorldPositionMultiplier_XYZZ)).zw;
+    r0.zw = ((r0.xyxy) * (Cloud.WorldPositionMultiplier_XYZZ.xyxy) + (-r0)).zw;
+    r0.xy = (r0.yxzw) + (Shroud.ScaleUV_OffsetUV.wzzw);
+    // 云的uv
+    Out.CloudAndShroud.xy = (r0.zwzw) + (Cloud.CurrentOffsetUV);
+    // 战争迷雾uv
+    Out.CloudAndShroud.zw = ((r0.xyxy) * (Shroud.ScaleUV_OffsetUV.xyyx)).zw;    
+
+    return Out;
+}
+
+// ----------------------------------------------------------------------------
+// 像素着色器 （Pixel Shader）
+// ----------------------------------------------------------------------------
+float4 PS(VSOutput In, uniform bool useTextureAlpha) : COLOR {
+    float4 textureColor;
+    if(useTextureAlpha) {
+        textureColor = tex2D(Texture_0Sampler, In.TexCoord0.xy);
+        textureColor += tex2D(Texture_0Sampler, In.TexCoord0.zw);
+    }
+    else {
+        textureColor = tex2D(Texture_0Sampler, In.TexCoord0.xy).xyzx;
+        textureColor += tex2D(Texture_0Sampler, In.TexCoord0.zw).xyzx;
+    }
+
+    float4 color = textureColor;
+    color.xyz += EmissiveColorFactor * ColorEmissive + RecolorColorFactor * RecolorColor;
+    if(useTextureAlpha) {
+        color.w *= In.Color.w;
+    }
+    else {
+        color.w = max(color.w, MinimumOpacity) * In.Color.w;
+    }
+
+    // 3DS Max里应该是没有战争迷雾的，
+    // 因此这段代码只有在着色器没有被3DS Max加载的情况下（也就是被游戏加载了）才有效
+#if !defined(_3DSMAX_)
+    color.xyz *= tex2D(ShroudTextureSampler, In.CloudAndShroud.wz).xyz;
+#endif
+    return color;
+}
+
+vertexshader VS_Array[3] = {
+    compile vs_2_0 VS1(),
+    compile vs_2_0 VS2(),
+    compile vs_2_0 VS3()
+};
+
+pixelshader PS_Array[2] = {
+    compile ps_2_0 PS(false),
+    compile ps_2_0 PS(true),
+};
+
+technique Default {
+    pass P0 {
+#if defined(_3DSMAX_)
+        VertexShader = compile vs_2_0 VS3DSMAX();
+        PixelShader = compile ps_2_0 PS(UseAlphaFromTextureAlphaChannel);
+#else
+        VertexShader = ARRAY_EXPRESSION_DIRECT_VS(VS_Array,
+            min(NumJointsPerVertex, 2) * VS_Multiplier_NumJointsPerVertex,
+            compile vs_2_0 VS3()
+        );
+        PixelShader = ARRAY_EXPRESSION_DIRECT_PS(PS_Array,
+            ( (int)UseAlphaFromTextureAlphaChannel ),
+            compile ps_2_0 PS(true, false)
+        );
+#endif
+
+        ZEnable = true;
+        ZFunc = LessEqual;
+        ZWriteEnable = ( DepthWriteEnable );
+        CullMode = ( CullingEnable ? D3DCULL_CW : D3DCULL_NONE );
+
+        AlphaBlendEnable = true;
+        SrcBlend = SrcAlpha;
+        DestBlend = InvSrcAlpha;
+
+        BlendOp = Add;
+
+	AlphaTestEnable = ( AlphaTestEnable );
+	AlphaFunc = GreaterEqual;
+	AlphaRef = DEFAULT_ALPHATEST_THRESHOLD;
+    }  
+}
+
+/*
+    color.xyz += sin(0.1 * (In.TexCoord0.xyz * float3(2, -5, 7) + In.CloudAndShroud.wzx * Time * 0.1));
+    color.xyz += cos(float3(0.2, -0.3, -0.1) * (In.TexCoord0.wzy * float3(-11, 17, 13) + In.CloudAndShroud.xyz * Time * 0.1));
+    color.xyz = abs(color.xyz) * 0.15;
+    color.w *= 2;
+*/
