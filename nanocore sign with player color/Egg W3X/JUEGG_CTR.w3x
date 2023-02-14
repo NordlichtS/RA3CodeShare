@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<W3DContainer id="JUEGGA" Hierarchy="JUEgg">
+		<SubObject SubObjectID="SUPERWEAPONEGGA" BoneIndex="15">
+			<RenderObject>
+				<Mesh>JUEGG.SUPERWEAPONEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="REFINERYEGGA" BoneIndex="14">
+			<RenderObject>
+				<Mesh>JUEGG.REFINERYEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="WARFACTORYEGGA" BoneIndex="13">
+			<RenderObject>
+				<Mesh>JUEGG.WARFACTORYEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="SUPERWEAPONADVANCEDEGGA" BoneIndex="12">
+			<RenderObject>
+				<Mesh>JUEGG.SUPERWEAPONADVANCEDEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="BASEDEFENSEEGGA" BoneIndex="11">
+			<RenderObject>
+				<Mesh>JUEGG.BASEDEFENSEEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="BASEDEFENSEADVANCEDEGGA" BoneIndex="10">
+			<RenderObject>
+				<Mesh>JUEGG.BASEDEFENSEADVANCEDEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="ECONOMICSTRUCTUREEGGA" BoneIndex="9">
+			<RenderObject>
+				<Mesh>JUEGG.ECONOMICSTRUCTUREEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="POWERPLANTEGGA" BoneIndex="8">
+			<RenderObject>
+				<Mesh>JUEGG.POWERPLANTEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="NAVALYARDEGGA" BoneIndex="7">
+			<RenderObject>
+				<Mesh>JUEGG.NAVALYARDEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="CONSTRUCTIONYARDEGGA" BoneIndex="6">
+			<RenderObject>
+				<Mesh>JUEGG.CONSTRUCTIONYARDEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="BARRACKSEGGA" BoneIndex="5">
+			<RenderObject>
+				<Mesh>JUEGG.BARRACKSEGGA</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="EGGBASE01" BoneIndex="4">
+			<RenderObject>
+				<Mesh>JUEGG.EGGBASE01</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="GLOWHOVER" BoneIndex="3">
+			<RenderObject>
+				<Mesh>JUEGG.GLOWHOVER</Mesh>
+			</RenderObject>
+		</SubObject>
+		<SubObject SubObjectID="OBBOX01" BoneIndex="1">
+			<RenderObject>
+				<CollisionBox>JUEGG.OBBOX01</CollisionBox>
+			</RenderObject>
+		</SubObject>
+	</W3DContainer>
+</AssetDeclaration>
