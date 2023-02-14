@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Texture id="FXYurikoShieldFractal" File="Yuriko/FXYurikoShieldFractal.dds" OutputFormat="DXT5"/>
+	<Texture id="FXYurikoShieldFadeLUT" File="Yuriko/FXYurikoShieldFadeLUT.dds" OutputFormat="DXT5"/>
+	<Texture id="FXNoise01NRM" File="Yuriko/FXNoise01NRM.dds" OutputFormat="DXT5"/>
+	<Texture id="FXLighting" File="Yuriko/FXLighting.tga" OutputFormat="DXT5"/>
+	<Texture id="FXEMPSpark" File="Yuriko/FXEMPSpark.tga" OutputFormat="DXT5"/>
+	<FXParticleSystemTemplate Drawable="FXYURIKOPSYONICBLAST" PerParticleAttachedSystem="" Priority="VERY_LOW_OR_ABOVE" Shader="W3D_ALPHA" SortLevel="1" SystemLifetime="1" Type="DRAWABLE" id="FXEMPBust">
+		<Lifetime High="40" Low="40"/>
+		<BurstCount High="1" Low="1"/>
+		<Alphas>
+			<Alpha Frame="1" High="1" Low="1" RelativeAge="0"/>
+			<Alpha Frame="2" High="0" Low="0" RelativeAge="100"/>
+		</Alphas>
+		<Colors>
+			<Color Frame="1" RelativeAge="0">
+				<Color b="1" g="1" r="1"/>
+			</Color>
+			<Color Frame="2" RelativeAge="100">
+				<Color b="0" g="0" r="0"/>
+			</Color>
+		</Colors>
+		<Physics>
+			<Default>
+				<VelocityDamping High="0.8" Low="0.8"/>
+			</Default>
+		</Physics>
+		<Draw>
+			<RenderObject>
+				<ObjectSet/>
+				<ObjectSet/>
+				<ObjectSet/>
+			</RenderObject>
+		</Draw>
+		<Volume>
+			<Cylinder>
+				<Offset x="0" y="0" z="0"/>
+			</Cylinder>
+		</Volume>
+		<Velocity/>
+		<Event/>
+		<Update>
+			<RenderObject Rotation="ROTATE_IN_WORLD_SPACE">
+				<AngleZ High="7" Low="-7"/>
+				<AngularRateZ High="0.1" Low="-0.1"/>
+				<AngularDamping High="0.9" Low="0.9"/>
+				<StartSize>
+					<x High="0.2" Low="0.2"/>
+					<y High="0.2" Low="0.2"/>
+					<z High="0.2" Low="0.2"/>
+				</StartSize>
+				<SizeRate>
+					<x High="0.15" Low="0.15"/>
+					<y High="0.15" Low="0.15"/>
+					<z High="0.15" Low="0.15"/>
+				</SizeRate>
+				<SizeDamping>
+					<x High="0.9" Low="0.9"/>
+					<y High="0.9" Low="0.9"/>
+					<z High="0.9" Low="0.9"/>
+				</SizeDamping>
+			</RenderObject>
+		</Update>
+	</FXParticleSystemTemplate>
+	
+	<FXParticleSystemTemplate ParticleTexture="FXEMPSpark" PerParticleAttachedSystem="" Priority="ALWAYS_RENDER" SystemLifetime="5" Type="GPU_PARTICLE" id="FXEMPSpark01">
+		<Lifetime High="40" Low="40"/>
+		<Size High="15" Low="15"/>
+		<BurstCount High="18" Low="18"/>
+		<Alphas>
+			<Alpha Frame="2" High="1" Low="1" RelativeAge="9"/>
+			<Alpha Frame="3" High="1" Low="1" RelativeAge="100"/>
+		</Alphas>
+		<Colors>
+			<Color Frame="1" RelativeAge="0">
+				<Color b="0.541176" g="0.541176" r="0.541176"/>
+			</Color>
+			<Color Frame="2" RelativeAge="9.999999">
+				<Color b="0.541176" g="0.541176" r="0.541176"/>
+			</Color>
+			<Color Frame="3" RelativeAge="75">
+				<Color b="0.541176" g="0.541176" r="0.541176"/>
+			</Color>
+			<Color Frame="4" RelativeAge="100">
+				<Color b="0.090196" g="0.090196" r="0.090196"/>
+			</Color>
+		</Colors>
+		<Physics>
+			<Default>
+				<VelocityDamping High="0.9" Low="0.9"/>
+			</Default>
+		</Physics>
+		<Draw>
+			<Gpu FramesPerRow="2" SpeedMultiplier="1" TotalFrames="4"/>
+		</Draw>
+		<Volume>
+			<Sphere IsHollow="false" Radius="70"/>
+		</Volume>
+		<Velocity>
+			<Ortho>
+				<Position>
+					<x High="9" Low="-9"/>
+					<y High="9" Low="-9"/>
+					<z High="9" Low="-9"/>
+				</Position>
+			</Ortho>
+		</Velocity>
+		<Event/>
+		<Update>
+			<Default Rotation="ROTATE_IN_WORLD_SPACE">
+				<SizeRate High="5" Low="5"/>
+				<SizeRateDamping High="0.9" Low="0.9"/>
+				<AngleZ High="0" Low="0"/>
+				<AngularRateZ High="0" Low="-0"/>
+				<AngularDampingXY High="0" Low="0"/>
+			</Default>
+		</Update>
+	</FXParticleSystemTemplate>
+	
+	<FXList id="FX_EMPBust">
+		<NuggetList>
+			<ParticleSystem Particle="FXEMPBust">
+				<Offset x="0.0" y="0.0" z="0.0"/>
+			</ParticleSystem>
+			<ParticleSystem Particle="FXEMPSpark01">
+				<Offset x="0.0" y="0.0" z="0.0"/>
+			</ParticleSystem>
+		</NuggetList>
+	</FXList>
+</AssetDeclaration>

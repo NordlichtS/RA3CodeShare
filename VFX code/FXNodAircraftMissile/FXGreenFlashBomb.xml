@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Includes>
+		<Include type="all" source="Tga/FXGreenflash4x4.xml" />
+		<Include type="all" source="FXGreenFlashBomb.w3x" />
+	</Includes>
+	
+	<FXParticleSystemTemplate ParticleTexture="FXGreenFlash" PerParticleAttachedSystem="" Priority="ALWAYS_RENDER" Shader="ALPHA" Type="GPU_PARTICLE" id="FXGreenFlashBomb">
+		<Lifetime High="0.5" Low="0.5"/>
+		<Size High="15" Low="15"/>
+		<BurstCount High="1" Low="1"/>
+		<Colors>
+			<Color Frame="1" RelativeAge="0">
+				<Color b="1" g="1" r="1"/>
+			</Color>
+			<Color Frame="2" RelativeAge="9.999999">
+				<Color b="1" g="1" r="1"/>
+			</Color>
+			<Color Frame="3" RelativeAge="75">
+				<Color b="1" g="1" r="1"/>
+			</Color>
+			<Color Frame="4" RelativeAge="100">
+				<Color b="1" g="1" r="1"/>
+			</Color>
+		</Colors>
+		<Physics>
+			<Default ParticlesAttachToBone="true">
+				<VelocityDamping High="1" Low="1"/>
+			</Default>
+		</Physics>
+		<Draw>
+			<Gpu FramesPerRow="4" SpeedMultiplier="1" TotalFrames="16"/>
+		</Draw>
+		<Volume>
+			<Cylinder>
+				<Offset x="0" y="0" z="0"/>
+			</Cylinder>
+		</Volume>
+		<Velocity>
+			<Ortho>
+				<Position>
+					<x High="0" Low="-0"/>
+					<y High="0" Low="-0"/>
+					<z High="0" Low="-0"/>
+				</Position>
+			</Ortho>
+		</Velocity>
+		<Event/>
+		<Update>
+			<Default>
+				<SizeRate High="1.5" Low="1.5"/>
+				<SizeRateDamping High="0" Low="0"/>
+				<AngleZ High="7" Low="0"/>
+				<AngularRateZ High="0.1" Low="-0.1"/>
+				<AngularDampingXY High="1" Low="1"/>
+			</Default>
+		</Update>
+	</FXParticleSystemTemplate>
+	
+	<FXParticleSystemTemplate ParticleTexture="FXMissileStreak" PerParticleAttachedSystem="" Priority="MEDIUM_OR_ABOVE" SortLevel="1" Type="TRAIL" id="GreenFlashBombTrail">
+		<Lifetime High="99998.992846" Low="99998.992846"/>
+		<Size High="1" Low="1"/>
+		<BurstDelay High="99998.992846" Low="99998.992846"/>
+		<BurstCount High="1" Low="1"/>
+		<Colors>
+			<Color Frame="1" RelativeAge="0">
+				<Color b="0.143137" g="1" r="143137"/>
+			</Color>
+			<Color Frame="2" RelativeAge="100">
+				<Color b="0" g="0" r="0"/>
+			</Color>
+		</Colors>
+		<Physics>
+			<Default ParticlesAttachToBone="true">
+				<VelocityDamping High="1" Low="1"/>
+			</Default>
+		</Physics>
+		<Draw>
+			<Trail TrailLife="7"/>
+		</Draw>
+		<Volume>
+			<Cylinder>
+				<Offset x="-5" y="0" z="0"/>
+			</Cylinder>
+		</Volume>
+		<Velocity>
+			<Ortho>
+				<Position>
+					<x High="0" Low="0"/>
+					<y High="0" Low="0"/>
+					<z High="0" Low="0"/>
+				</Position>
+			</Ortho>
+		</Velocity>
+		<Event/>
+		<Update>
+			<Default>
+				<SizeRateDamping High="1" Low="1"/>
+				<AngularDampingXY High="1" Low="1"/>
+			</Default>
+		</Update>
+	</FXParticleSystemTemplate>
+	
+	<FXList id="FX_GreenFlashBombExplosion">
+		<NuggetList>
+			<ParticleSystem Particle="JapanBigMissileHitExplosion02">
+				<Offset x="0.0" y="0.0" z="0.0"/>
+			</ParticleSystem>
+		</NuggetList>
+	</FXList>
+</AssetDeclaration>
