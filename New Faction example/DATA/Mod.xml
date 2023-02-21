@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Includes>
+
+
+	<Include type="reference" source="DATA:static.xml" />
+	<Include type="reference" source="DATA:global.xml" />
+	<Include type="reference" source="DATA:audio.xml" />
+
+
+  <!-- 图标 -->
+  <Include type="all" source="DATA:NewSide/Data/Specific/GameSetup_flag_China.xml"/>
+  
+  <!-- 基地车MCV  -->               
+  <Include type="all" source="DATA:NewSide/Data/Units/ChinaMCV.xml"/>
+
+  <!-- 基地  -->               
+  <Include type="all" source="DATA:NewSide/Data/Structures/ChinaConstructionYard.xml"/>
+
+  <!-- 生产栏数据  -->               
+  <Include type="all" source="DATA:NewSide/Data/System/CommandData.xml"/>
+
+  <!-- 阵营数据  -->               
+  <Include type="all" source="DATA:NewSide/Data/System/PlayerTemplates.xml"/>
+
+  <!-- 机密协议中全阵营用的升级类卡片 -->               
+  <Include type="all" source="DATA:NewSide/Data/System/PlayerTechUpgradeBindings.xml"/>
+
+  <!-- 机密协议科技等级设置 -->               
+  <Include type="all" source="DATA:NewSide/Data/System/PlayerTechs.xml"/>
+
+  <!-- 特殊能力  -->               
+  <Include type="all" source="DATA:NewSide/Data/System/SpecialPowerTemplates.xml"/>
+
+  <!-- 机密协议注册 -->               
+  <Include type="all" source="DATA:NewSide/Data/System/PlayerSpellBook.xml"/>
+
+  <!-- 机密协议科技树的排版顺序 -->               
+  <Include type="all" source="DATA:NewSide/Data/System/PlayerTechStoreTemplates.xml"/>
+
+
+
+
+</Includes>
+	
+</AssetDeclaration>

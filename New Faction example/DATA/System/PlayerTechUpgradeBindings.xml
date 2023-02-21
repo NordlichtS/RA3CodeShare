@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset">
+
+
+	<PlayerTechUpgradeBinding
+		id="PlayerTechUpgradeBinding_China">
+		<Binding
+			TechDependency="PlayerTech_Allied_HighTechnology"
+			UpgradeToGrant="Upgrade_AlliedHighTechnology"/>
+		<Binding
+			TechDependency="PlayerTech_Allied_AirPower"
+			UpgradeToGrant="Upgrade_AlliedAirPower"/>
+	</PlayerTechUpgradeBinding>
+
+</AssetDeclaration>

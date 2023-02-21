@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset">
+	<Includes>
+	</Includes>
+
+			<!-- 新阵营机密例子，特殊能力代码样板-->
+
+	<SpecialPowerTemplate
+		id="SpecialPowerSatelliteSweep_China"
+		ReloadTime="120s"
+		TargetType="LOCATION"
+		InitiateAtLocationSound="ALL_SurveillanceSweep_CursorIn"
+		NumTargets="2" 
+		RadiusCursorRadius="150"
+		Flags="IS_PLAYER_POWER WATER_OK FOGGED_SHROUDED_CELLS_OK"
+		EvaEventToPlayWhenSelectingTarget="SelectLocation"
+		RequiredPlayerTech="PlayerTech_China_SatelliteSweep">
+		<GameDependency
+			id="Allied_SatelliteSweep_GameDependency">
+			<RequiredObject>ChinaConstructionYard</RequiredObject>
+		</GameDependency>
+	</SpecialPowerTemplate>
+	
+	
+</AssetDeclaration>

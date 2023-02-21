@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset">
+
+	<!-- Faction-specific Techs -->
+	<PlayerTech
+		id="PlayerTech_China"/>
+
+
+	<!-- Rank-specific Techs -->
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_1"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_2"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_3"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_4"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_5"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_6"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_7"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_8"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_9"/>
+
+	<PlayerTech
+		id="PlayerTech_Generic_Rank_10"/>
+
+
+	<!-- Production Bonus Techs -->
+	<PlayerTech
+		id="PlayerTech_ProductionBonus_China"
+		TechPointsRequired="1">
+		<TechDependency></TechDependency>
+		<TechDependency>PlayerTech_Generic_Rank_5</TechDependency>
+	</PlayerTech>
+
+	<!-- 新机密协议例子 -->
+
+	<PlayerTech
+		id="PlayerTech_China_SatelliteSweep"
+		TechPointsRequired="1">
+		<TechDependency>PlayerTech_China</TechDependency>
+		<TechDependency>PlayerTech_Generic_Rank_1</TechDependency>
+	</PlayerTech>
+	
+</AssetDeclaration>

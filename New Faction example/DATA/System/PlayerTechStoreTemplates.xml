@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset">
+	<Tags />
+	<Includes/>
+
+	<!-- »úÃÜÀý×Ó -->
+	<PurchasePlayerTechButtonTemplate
+		id="Purchase_PlayerTech_ProductionBonus_China"
+		PlayerTech=""
+		StateData="ButtonStatePlayerPowerAlliedFreeTrade"/>
+
+	<PurchasePlayerTechButtonTemplate
+		id="Purchase_PlayerTech_China_SatelliteSweep"
+		PlayerTech="PlayerTech_China_SatelliteSweep"
+		StateData="ButtonStatePlayerPowerSatelliteSweep"/>
+
+
+
+	<PlayerTechStoreTemplate
+		id="PlayerTechStore_Neutral"
+		Faction="Neutral">
+		<Row>
+			<Button>Purchase_PlayerTech_China_SatelliteSweep</Button>
+			<Button></Button>
+			<Button></Button>
+		</Row>
+		<Row>
+			<Button></Button>
+			<Button></Button>
+			<Button></Button>
+		</Row>
+		<Row>
+			<Button></Button>
+			<Button></Button>
+      <Button></Button>
+    </Row>
+    <Row>
+      <Button></Button>
+      <Button></Button>
+      <Button></Button>
+    </Row>
+    <Row>
+      <Button></Button>
+      <Button>Purchase_PlayerTech_ProductionBonus_China</Button>
+      <Button></Button>
+		</Row>
+	</PlayerTechStoreTemplate>
+
+</AssetDeclaration>

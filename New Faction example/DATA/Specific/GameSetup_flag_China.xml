@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<Texture id="GameSetup_flag_China" File="GameSetup_flag_China.tga" OutputFormat="A8R8G8B8" GenerateMipMaps="false" AllowAutomaticResize="false"/>
+
+	<PackedTextureImage id="GameSetup_flag_China" Texture="GameSetup_flag_China" Rotated="false">
+		<Dimensions x="49" y="25"/>
+		<Coords x="0" y="0"/>
+		<TextureDimensions x="49" y="25"/>
+	</PackedTextureImage>
+
+</AssetDeclaration>
