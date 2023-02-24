@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<AssetDeclaration xmlns="uri:ea.com:eala:asset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<AptAptData id="feg_m_mainMenu3D_apt" File="feg_m_mainMenu3D.apt" />
+	<AptConstData id="feg_m_mainMenu3D_const" File="feg_m_mainMenu3D.const" />
+	<AptDatData id="feg_m_mainMenu3D_dat" File="feg_m_mainMenu3D.dat" />
+	<AptGeometryData id="feg_m_mainMenu3D_15" File="feg_m_mainMenu3D_geometry\15.ru" AptID="15"/>
+	<AptGeometryData id="feg_m_mainMenu3D_17" File="feg_m_mainMenu3D_geometry\17.ru" AptID="17"/>
+	<AptGeometryData id="feg_m_mainMenu3D_22" File="feg_m_mainMenu3D_geometry\22.ru" AptID="22"/>
+	<AptGeometryData id="feg_m_mainMenu3D_24" File="feg_m_mainMenu3D_geometry\24.ru" AptID="24"/>
+	<AptGeometryData id="feg_m_mainMenu3D_26" File="feg_m_mainMenu3D_geometry\26.ru" AptID="26"/>
+	<AptGeometryData id="feg_m_mainMenu3D_29" File="feg_m_mainMenu3D_geometry\29.ru" AptID="29"/>
+	<AptGeometryData id="feg_m_mainMenu3D_34" File="feg_m_mainMenu3D_geometry\34.ru" AptID="34"/>
+	<AptGeometryData id="feg_m_mainMenu3D_5" File="feg_m_mainMenu3D_geometry\5.ru" AptID="5"/>
+	<AptGeometryData id="feg_m_mainMenu3D_6" File="feg_m_mainMenu3D_geometry\6.ru" AptID="6"/>
+	<AptGeometryData id="feg_m_mainMenu3D_8" File="feg_m_mainMenu3D_geometry\8.ru" AptID="8"/>
+	<AptGeometryData id="feg_m_mainMenu3D_9" File="feg_m_mainMenu3D_geometry\9.ru" AptID="9"/>
+	<Texture id="apt_feg_m_mainMenu3D_1" File="art\Textures\apt_feg_m_mainMenu3D_1.tga" OutputFormat="A8R8G8B8" GenerateMipMaps="false" AllowAutomaticResize="false"/>
+	<Texture id="apt_feg_m_mainMenu3D_2" File="art\Textures\ff.png" OutputFormat="A8R8G8B8" GenerateMipMaps="false" AllowAutomaticResize="false"/>
+</AssetDeclaration>
